@@ -10,6 +10,9 @@ import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import fi.message.queue.tasks.GenericTask;
+import fi.message.queue.tasks.SmallTask;
+
 
 
 public class Worker {
@@ -37,9 +40,15 @@ public class Worker {
 	
 	messageListenerContainer.setMessageListener(new MessageListener() {
          public void onMessage(Message message) {
-             final DelayTask dtask = (DelayTask) messageConverter.fromMessage(message);
+             final GenericTask gtask = (GenericTask) messageConverter.fromMessage(message);
 
-             System.out.println("Message received from Message Queue " + dtask.getMessage());
+             System.out.println("Performing the recieved task from message queue with message: " + gtask.getMessage());
+             try {
+				gtask.doTask();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
          }
      });
 	
